@@ -1,11 +1,16 @@
 class UsersController < ApplicationController
+  load_and_authorize_resource  :except =>[:login, :create]
+  skip_before_action :authorize_request!, only: [:login, :create]
+
   def index
-    @users = User.all
     if params[:email]
-      @users = @users.find_by!(email: params[:email])
+      @users = User.where(email: params[:email])
     elsif params[:name]
-      @users = @users.find_by!(name: params[:name])
+      @users = User.where(name: params[:name])
+    else
+      @users = User.all
     end
+
     render json: @users
   end
 
@@ -22,7 +27,8 @@ class UsersController < ApplicationController
   def login
     @user = User.find_by(email: params[:email])
     if @user && @user.authenticate(params[:password])
-      token = encode_token({ user_id: @user.id })
+      p @user
+      token = encode_token({ id: @user.id })
       render json: { user: @user, token: token }
     else
       render json: { error: 'Invalid email or password.' }
@@ -35,13 +41,14 @@ class UsersController < ApplicationController
       render json: @user
     else
       puts @user.errors.full_messages
-      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @user.errors }, status: :unprocessable_entity
     end
   end
 
   def search
     begin
       @user = User.find_by!(email: params[:email])
+      success_respose(@user)
       render json: @user
     rescue ActiveRecord::RecordNotFound
       render json: { error: 'User not found.' }
@@ -61,10 +68,10 @@ class UsersController < ApplicationController
   private
 
   def create_params
-    params.require(:user).permit(:email, :password, :name)
+    params.require(:user).permit(:email, :password, :name, :role_id)
   end
 
   def update_params
-    params.require(:user).permit(:name)
+    params.require(:user).permit(:name, :email)
   end
 end

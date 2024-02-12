@@ -1,5 +1,19 @@
 class ApplicationController < ActionController::API
-  # protect_from_forgery
+  before_action :authorize_request!
+
+  rescue_from CanCan::AccessDenied do |exception|
+    render json: { error: 'Unauthorized' },  status: :unauthorized
+  end
+
+  private
+
+  def authorize_request!
+    render json: { error: 'Unauthorized' }, status: :unauthorized unless current_user
+  end
+
+  def current_user
+    @current_user = User.find(decoded_token['id']) if decoded_token
+  end
 
   def encode_token(payload)
     JWT.encode(payload, Rails.application.credentials[:secret_key_base])
@@ -8,9 +22,9 @@ class ApplicationController < ActionController::API
   def decoded_token
     header = request.headers['Authorization']
     if header
-      token = header.split(" ")[1]
+      token = header.split(' ').last
       begin
-        JWT.decode(token, Rails.application.credentials[:secret_key_base])
+        JWT.decode(token, Rails.application.credentials[:secret_key_base]).first
       rescue JWT::DecodeError
         nil
       end
