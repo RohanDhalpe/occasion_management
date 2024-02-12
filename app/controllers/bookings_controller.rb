@@ -1,12 +1,25 @@
-# app/controllers/bookings_controller.rb
 class BookingsController < ApplicationController
   before_action :set_booking, only: [:show, :update, :destroy]
 
   # GET /bookings
   def index
     @bookings = Booking.all
+
+    if params[:venue_id]
+      @bookings = @bookings.where(venue_id: params[:venue_id])
+    elsif params[:user_id]
+      @bookings = @bookings.where(user_id: params[:user_id])
+    elsif params[:booking_date]
+      @bookings = @bookings.where(booking_date: params[:booking_date])
+    elsif params[:start_time] && params[:end_time]
+      @bookings = @bookings.where(start_time: params[:start_time]..params[:end_time])
+    elsif params[:status]
+      @bookings = @bookings.where(status: params[:status])
+    end
+
     render json: @bookings
   end
+
 
   # GET /bookings/1
   def show
@@ -35,18 +48,23 @@ class BookingsController < ApplicationController
 
   # DELETE /bookings/1
   def destroy
-    @booking.destroy
-    render json: { message: 'Booking was successfully destroyed' }
+    @booking = Booking.find_by(id: params[:id])
+
+    if @booking.nil?
+      render json: { error: 'Booking not found' }, status: :not_found
+    else
+      @booking.destroy
+      render json: { message: 'Booking with ID ' + params[:id] + ' was successfully destroyed' }
+    end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_booking
-      @booking = Booking.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def booking_params
-      params.require(:booking).permit(:user_id, :venue_id, :booking_date, :start_time, :end_time)
-    end
+  def set_booking
+    @booking = Booking.find(params[:id])
+  end
+
+  def booking_params
+    params.require(:booking).permit(:user_id, :venue_id, :booking_date, :start_time, :end_time, :status)
+  end
 end
