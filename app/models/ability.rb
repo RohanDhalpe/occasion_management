@@ -6,9 +6,10 @@ class Ability
   def initialize(user)
     if user.customer?
       can :read, User
-
+      can :create, Booking
+      can [:update, :destroy], Booking, user_id: user.id, status: 'booked'
+    elsif user.admin?
+      can :manage, :all
     end
-
-    can :update, User
   end
 end
