@@ -12,7 +12,7 @@ class BookingsController < ApplicationController
     elsif params[:booking_date]
       @bookings = @bookings.where(booking_date: params[:booking_date])
     elsif params[:start_time] && params[:end_time]
-      @bookings = @bookings.where(start_time: params[:start_time]..params[:end_time])
+      @bookings = @bookings.where('start_time >= ? AND end_time <= ?',params[:start_time], params[:end_time])
     elsif params[:status]
       @bookings = @bookings.where(status: params[:status])
     end
@@ -28,6 +28,7 @@ class BookingsController < ApplicationController
 
   # POST /bookings
   def create
+    p booking_params
     @booking = Booking.new(booking_params)
 
     if @booking.save

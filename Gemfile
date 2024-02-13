@@ -39,6 +39,9 @@ group :development, :test do
   gem 'byebug'
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mswin mswin64 mingw x64_mingw ]
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
+  gem 'faker'
 end
 
 group :development do
@@ -46,8 +49,12 @@ group :development do
   # gem "spring"
 
   gem "error_highlight", ">= 0.4.0", platforms: [:ruby]
+
 end
 
+group :test do
+  gem 'shoulda-matchers', '~> 6.0'
+end
 
 gem 'jwt'
 gem "bcrypt", "~> 3.1.7"

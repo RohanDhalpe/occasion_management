@@ -2,7 +2,7 @@ class ApplicationController < ActionController::API
   before_action :authorize_request!
 
   rescue_from CanCan::AccessDenied do |exception|
-    render json: { error: 'Unauthorized' },  status: :unauthorized
+    render json: { error: 'Unauthorized' }, status: :unauthorized
   end
 
   private
