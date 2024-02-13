@@ -3,6 +3,13 @@ class Booking < ApplicationRecord
   belongs_to :venue
 
   # validates :venue_id, :user_id
+  validates :user_id, presence: true
+  validates :venue_id, presence: true
+  validates :booking_date, presence: true
+  validates :start_time, presence: true
+  validates :end_time, presence: true
+  validates :status, presence: true
+
   validate :no_overlapping_bookings
 
   def no_overlapping_bookings

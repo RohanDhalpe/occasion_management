@@ -45,16 +45,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def search
-    begin
-      @user = User.find_by!(email: params[:email])
-      success_respose(@user)
-      render json: @user
-    rescue ActiveRecord::RecordNotFound
-      render json: { error: 'User not found.' }
-    end
-  end
-
   def destroy
     @user = User.find_by(id: params[:id])
     if @user
