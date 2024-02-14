@@ -8,6 +8,7 @@ RSpec.describe VenuesController, type: :controller do
   let(:token_new) { encode_token(id: user.id) }
   let(:token) { "Bearer #{token_new}" }
   let!(:venues) { FactoryBot.create_list(:venue, 3) }
+  let(:venue) { venues.first }
 
   describe 'GET #index' do
     it 'Get venue with venue_type' do
@@ -21,7 +22,7 @@ RSpec.describe VenuesController, type: :controller do
 
     context 'without token' do
       it 'returns unauthorized' do
-        get :index, params: { email: Faker::Internet.email }
+        get :index, params: { user_id: user.id }
         expect(response).to have_http_status(:unauthorized)
       end
     end
@@ -31,7 +32,7 @@ RSpec.describe VenuesController, type: :controller do
 
       it 'returns unauthorized' do
         request.headers["Authorization"] = invalid_token
-        get :index, params: { email: Faker::Internet.email }
+        get :index, params: { user_id: user.id }
         expect(response).to have_http_status(:unauthorized)
       end
     end
@@ -56,7 +57,7 @@ RSpec.describe VenuesController, type: :controller do
       request.headers['Authorization'] = token
       post :create, params: {
         venue: {
-          name: '', # Invalid name to trigger validation error
+          name: '',
           venue_type: 'Conference Hall',
           start_time: '09:00:00',
           end_time: '17:00:00'
@@ -85,4 +86,15 @@ RSpec.describe VenuesController, type: :controller do
       expect(response.content_type).to eq('application/json; charset=utf-8')
     end
   end
+
+  describe 'DELETE #destroy' do
+   it "delete venue" do
+    request.headers["Authorization"] = "Bearer #{token}"
+    delete :destroy, params: {
+      id: venue.id,
+    }
+    expect(response).to have_http_status(:ok)
+    expect(response.content_type).to eq('application/json; charset=utf-8')
+  end
+ end
 end

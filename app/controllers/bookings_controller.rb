@@ -20,7 +20,6 @@ class BookingsController < ApplicationController
     render json: @bookings
   end
 
-
   # GET /bookings/1
   def show
     render json: @booking
@@ -28,7 +27,6 @@ class BookingsController < ApplicationController
 
   # POST /bookings
   def create
-    p booking_params
     @booking = Booking.new(booking_params)
 
     if @booking.save
@@ -50,8 +48,8 @@ class BookingsController < ApplicationController
   # DELETE /bookings/1
   def destroy
     @booking = Booking.find_by(id: params[:id])
-
     if @booking.nil?
+      byebug
       render json: { error: 'Booking not found' }, status: :not_found
     else
       @booking.destroy

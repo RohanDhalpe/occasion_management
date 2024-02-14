@@ -35,4 +35,27 @@ RSpec.describe User, type: :model do
 
     it { should validate_uniqueness_of(:email).case_insensitive }
   end
+
+  describe '#as_json' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:json) { user.as_json }
+
+    it 'returns a hash without created_at, updated_at, and password_digest' do
+      expect(json.keys).to match_array(['id', 'name', 'email', 'role_id'])
+      expect(json.keys).not_to include('created_at', 'updated_at', 'password_digest')
+    end
+
+    it 'includes other attributes' do
+      expect(json['id']).to eq(user.id)
+      expect(json['name']).to eq(user.name)
+      expect(json['email']).to eq(user.email)
+      expect(json['role_id']).to eq(user.role_id)
+    end
+
+    it 'accepts options' do
+      json_with_options = user.as_json(only: [:name, :email])
+      expect(json_with_options.keys).to match_array(['name', 'email'])
+      expect(json_with_options.keys).not_to include('id', 'role_id', 'created_at', 'updated_at', 'password_digest')
+    end
+  end
 end

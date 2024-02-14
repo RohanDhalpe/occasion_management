@@ -24,7 +24,6 @@ RSpec.describe Booking, type: :model do
       user = create(:user, role: role)
       venue = create(:venue)
 
-      # Act
       booking = Booking.new(
         user: user,
         venue: venue,
@@ -34,7 +33,6 @@ RSpec.describe Booking, type: :model do
         status: 'cancelled'
       )
 
-      # Assert
       expect(booking).to be_valid
     end
   end

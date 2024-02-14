@@ -21,7 +21,19 @@ RSpec.describe UsersController, type: :controller do
     context 'with name parameter' do
       it 'renders JSON with matching name' do
         request.headers["Authorization"] = token
-        get :index, params: { name: "abc" } # Provide the name parameter
+        get :index, params: { name: "abc" }
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to eq('application/json; charset=utf-8')
+
+        parsed_response = JSON.parse(response.body)
+        expect(parsed_response.any? { |user| user["name"] == "abc" }).to be true
+      end
+    end
+
+    context 'without any parameter' do
+      it 'renders JSON with matching name' do
+        request.headers["Authorization"] = token
+        get :index, params: {  } # Provide the name parameter
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to eq('application/json; charset=utf-8')
 
@@ -97,16 +109,13 @@ RSpec.describe UsersController, type: :controller do
   end
 
   describe 'DELETE #destroy' do
-  it "delete user" do
-    request.headers["Authorization"]=token
-    delete :destroy, params: {
-      id: user.id,
-    }
-    expect(response).to have_http_status(:ok)
-    expect(response.content_type).to eq('application/json; charset=utf-8')
+    it "delete user" do
+      request.headers["Authorization"]=token
+      delete :destroy, params: {
+        id: user.id,
+      }
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to eq('application/json; charset=utf-8')
+    end
   end
-end
-
-
-
 end

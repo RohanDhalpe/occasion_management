@@ -37,8 +37,13 @@ class VenuesController < ApplicationController
 
   # DELETE /venues/1
   def destroy
-    @venue.destroy
-    render json: { message: 'Venue was successfully destroyed' }
+    @venue = Venue.find_by(id: params[:id])
+    if @venue
+      @venue.destroy
+      render json: { message: 'venue deleted successfully.' }
+    else
+      render json: { error: 'Venue not found.' }, status: :not_found
+    end
   end
 
   private
