@@ -2,13 +2,13 @@ class ApplicationController < ActionController::API
   before_action :authorize_request!
 
   rescue_from CanCan::AccessDenied do |exception|
-    render json: { error: 'Unauthorized' }, status: :unauthorized
+    render json: { error: 'You are Unauthorized for this action' }, status: :unauthorized
   end
 
   private
 
   def authorize_request!
-    render json: { error: 'Unauthorized' }, status: :unauthorized unless current_user
+    render json: { error: 'You are Unauthorized for this action' }, status: :unauthorized unless current_user
   end
 
   def current_user

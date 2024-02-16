@@ -61,7 +61,7 @@ RSpec.describe UsersController, type: :controller do
   end
 
   describe 'POST #create' do
-    let(:valid_params) { { name: Faker::Name.name, email: Faker::Internet.email, password: Faker::Internet.password(min_length: 8), role_id: role.id } }
+    let(:valid_params) { { name: Faker::Name.name, email: Faker::Internet.email, password: Faker::Internet.password(min_length: 8)} }
 
     context 'with valid params' do
       it 'creates a new user' do

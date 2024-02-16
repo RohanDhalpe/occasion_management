@@ -28,4 +28,14 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  errors:
+    unauthorized: "Unauthorized"
+    invalid_credentials: "Invalid email or password."
+    user_create_error: "Failed to create user: %{errors}"
+    user_update_error: "Failed to update user: %{errors}"
+    user_delete_error: "Failed to delete user: %{errors}"
+    not_found:
+      booking: "Booking not found"
+      venue: "Venue not found."
+
+

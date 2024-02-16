@@ -1,56 +1,49 @@
 class BookingsController < ApplicationController
   before_action :set_booking, only: [:show, :update, :destroy]
+  load_and_authorize_resource
 
-  # GET /bookings
   def index
-    @bookings = Booking.all
-
-    if params[:venue_id]
-      @bookings = @bookings.where(venue_id: params[:venue_id])
-    elsif params[:user_id]
-      @bookings = @bookings.where(user_id: params[:user_id])
-    elsif params[:booking_date]
-      @bookings = @bookings.where(booking_date: params[:booking_date])
-    elsif params[:start_time] && params[:end_time]
-      @bookings = @bookings.where('start_time >= ? AND end_time <= ?',params[:start_time], params[:end_time])
-    elsif params[:status]
-      @bookings = @bookings.where(status: params[:status])
+    if current_user.customer?
+      @bookings = current_user.bookings
+    elsif current_user.admin?
+      @bookings = Booking.all
+      apply_filters
     end
 
     render json: @bookings
   end
 
-  # GET /bookings/1
   def show
     render json: @booking
   end
 
-  # POST /bookings
   def create
     @booking = Booking.new(booking_params)
 
     if @booking.save
       render json: @booking, status: :created
     else
-      render json: @booking.errors, status: :unprocessable_entity
+      render json: { error: @booking.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /bookings/1
   def update
-    if @booking.update(booking_params)
+    if @booking.nil?
+      render json: { error: I18n.t('errors.not_found.booking') }, status: :not_found
+    elsif @booking.user != current_user
+      render json: { error: I18n.t('errors.unauthorized') }, status: :unauthorized
+    elsif @booking.update(booking_params)
       render json: @booking
     else
-      render json: @booking.errors, status: :unprocessable_entity
+      render json: { error: @booking.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
-  # DELETE /bookings/1
   def destroy
-    @booking = Booking.find_by(id: params[:id])
     if @booking.nil?
-      byebug
-      render json: { error: 'Booking not found' }, status: :not_found
+      render json: { error: I18n.t('errors.not_found.booking') }, status: :not_found
+    elsif @booking.user != current_user
+      render json: { error: I18n.t('errors.unauthorized') }, status: :unauthorized
     else
       @booking.destroy
       render json: { message: 'Booking with ID ' + params[:id] + ' was successfully destroyed' }
@@ -59,8 +52,16 @@ class BookingsController < ApplicationController
 
   private
 
+  def apply_filters
+    @bookings = @bookings.where(venue_id: params[:venue_id]) if params[:venue_id].present?
+    @bookings = @bookings.where(user_id: params[:user_id]) if params[:user_id].present?
+    @bookings = @bookings.where(booking_date: params[:booking_date]) if params[:booking_date].present?
+    @bookings = @bookings.where(status: params[:status]) if params[:status].present?
+    @bookings = @bookings.where('start_time >= ? AND end_time <= ?', params[:start_time], params[:end_time]) if params[:start_time].present? && params[:end_time].present?
+  end
+
   def set_booking
-    @booking = Booking.find(params[:id])
+    @booking = Booking.find_by(id: params[:id])
   end
 
   def booking_params
