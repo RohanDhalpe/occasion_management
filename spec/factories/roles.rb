@@ -1,5 +1,6 @@
+
 FactoryBot.define do
-  factory :custom_role, class: Role do
-    name { 'ADMIN' }
+  factory :role do
+    name { Faker::Lorem.word.capitalize }
   end
 end

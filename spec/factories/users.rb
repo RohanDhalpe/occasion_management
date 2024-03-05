@@ -1,20 +1,15 @@
 FactoryBot.define do
-  factory :role do
-    name { 'ADMIN' }
-  end
-
   factory :user do
-    name { Faker::Name.name }
-    email { Faker::Internet.unique.email }
-    password { 'password' }
-    role { FactoryBot.create(:role) }
-
-    trait :admin do
-      role { FactoryBot.create(:role, name: 'ADMIN') }
+    transient do
+      role_name { User::DEFAULT_ROLE_NAME }
     end
 
-    trait :customer do
-      role { FactoryBot.create(:role, name: 'CUSTOMER') }
+    name { Faker::Name.name }
+    email { Faker::Internet.email }
+    password { Faker::Internet.password }
+
+    before(:create) do |user, evaluator|
+      user.role = Role.find_or_create_by(name: evaluator.role_name)
     end
   end
 end

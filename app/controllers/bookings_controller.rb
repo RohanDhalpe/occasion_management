@@ -23,27 +23,27 @@ class BookingsController < ApplicationController
     if @booking.save
       render json: @booking, status: :created
     else
-      render json: { error: @booking.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: I18n.t('errors.booking_create_failed') }, status: :unprocessable_entity
     end
   end
 
   def update
     if @booking.nil?
-      render json: { error: I18n.t('errors.not_found.booking') }, status: :not_found
+      render json: { error: I18n.t('errors.record_not_found') }, status: :not_found
     elsif @booking.user != current_user
-      render json: { error: I18n.t('errors.unauthorized') }, status: :unauthorized
+      render json: { error: I18n.t('errors.unauthorized_update') }, status: :unauthorized
     elsif @booking.update(booking_params)
       render json: @booking
     else
-      render json: { error: @booking.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: I18n.t('errors.booking_update_failed') }, status: :unprocessable_entity
     end
   end
 
   def destroy
     if @booking.nil?
-      render json: { error: I18n.t('errors.not_found.booking') }, status: :not_found
+      render json: { error: I18n.t('errors.record_not_found') }, status: :not_found
     elsif @booking.user != current_user
-      render json: { error: I18n.t('errors.unauthorized') }, status: :unauthorized
+      render json: { error: I18n.t('errors.unauthorized_delete') }, status: :unauthorized
     else
       @booking.destroy
       render json: { message: 'Booking with ID ' + params[:id] + ' was successfully destroyed' }

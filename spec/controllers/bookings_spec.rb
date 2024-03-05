@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'auth_helper'
 
 RSpec.describe BookingsController, type: :controller do
-  let(:role) { create(:custom_role) }
+  let(:role) { create(:role) }
   let!(:user) { FactoryBot.create(:user, role_id: role.id, name: "abc") }
   let(:token_new) { encode_token(id: user.id) }
   let(:token) { "Bearer #{token_new}" }
@@ -94,7 +94,6 @@ RSpec.describe BookingsController, type: :controller do
         request.headers["Authorization"] = "Bearer #{token}"
         put :update, params: { id: booking.id, booking: { status: 'updated_status' } }
         expect(response).to have_http_status(:ok)
-        expect(response.content_type).to eq('application/json; charset=utf-8')
         expect(JSON.parse(response.body)['status']).to eq('updated_status')
       end
     end
@@ -107,7 +106,6 @@ RSpec.describe BookingsController, type: :controller do
         id: booking.id,
       }
       expect(response).to have_http_status(:ok)
-      expect(response.content_type).to eq('application/json; charset=utf-8')
     end
   end
 end

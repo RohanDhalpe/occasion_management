@@ -3,23 +3,18 @@ class UsersController < ApplicationController
   skip_before_action :authorize_request!, only: [:login, :create]
 
   def index
-    if current_user
-      @users = User.where(id: current_user.id)
-      render json: @users
-    else
-      render json: { error: I18n.t('errors.unauthorized') }, status: :unauthorized
-    end
+    @users = current_user.admin? ? User.all : current_user
+
+    render json: @users
   end
 
   def create
-    @user = User.new(create_params)
-    @user.role ||= Role.find_by(name: 'CUSTOMER')
-
-    if @user.save
+    @user = User.create(create_params)
+    if @user.valid?
       @token = encode_token(@user.id)
       render json: { user: @user, token: @token }
     else
-      render json: { error: I18n.t('errors.user_create_error', errors: @user.errors.full_messages.join(', ')) }, status: :unprocessable_entity
+      render json: { error: I18n.t('errors.user_create_failed') }, status: :unprocessable_entity
     end
   end
 
@@ -42,7 +37,7 @@ class UsersController < ApplicationController
     if @user.update(update_params)
       render json: @user
     else
-      render json: { error: I18n.t('errors.user_update_error', errors: @user.errors.full_messages.join(', ')) }, status: :unprocessable_entity
+      render json: { error: I18n.t('errors.user_update_failed') }, status: :unprocessable_entity
     end
   end
 
@@ -50,7 +45,7 @@ class UsersController < ApplicationController
     if @user.destroy
       render json: { message: 'User deleted successfully.' }
     else
-      render json: { error: 'Unable to delete user.' }, status: :unprocessable_entity
+      render json: { error: I18n.t('errors.user_delete_failed') }, status: :unprocessable_entity
     end
   end
 

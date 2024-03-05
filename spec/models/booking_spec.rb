@@ -1,7 +1,8 @@
-
 require 'rails_helper'
 
 RSpec.describe Booking, type: :model do
+  let(:user) { create(:user) }
+  let(:venue) { create(:venue) }
 
   describe 'validations' do
     it { should validate_presence_of(:user_id) }
@@ -17,23 +18,41 @@ RSpec.describe Booking, type: :model do
     it { should belong_to(:venue) }
   end
 
-  describe 'factory' do
-    it 'is valid' do
-      # Arrange
-      role = create(:role)
-      user = create(:user, role: role)
-      venue = create(:venue)
+  describe 'custom validations' do
+    it 'does not allow overlapping bookings' do
+      booking = create(:booking, venue: venue, start_time: Time.now, end_time: Time.now + 1.hour)
+      overlapping_booking = build(:booking, venue: venue, start_time: Time.now + 30.minutes, end_time: Time.now + 1.hour + 30.minutes)
 
-      booking = Booking.new(
-        user: user,
-        venue: venue,
-        booking_date: '2024-02-20',
-        start_time: '2024-02-13 20:23:30',
-        end_time: '2024-02-14 17:42:20',
-        status: 'cancelled'
-      )
+      expect(overlapping_booking).not_to be_valid
+      expect(overlapping_booking.errors[:base]).to include("Booking overlaps with an existing booking")
+    end
+  end
 
-      expect(booking).to be_valid
+  describe '#as_json' do
+    let(:booking) { create(:booking, user: user, venue: venue) }
+    let(:json_data) { booking.as_json }
+
+    it 'returns a JSON representation of the booking excluding created_at and updated_at' do
+      expect(json_data.keys).to contain_exactly('id', 'user_id', 'venue_id', 'booking_date', 'start_time', 'end_time', 'status')
+      expect(json_data.keys).not_to include('created_at', 'updated_at')
+    end
+  end
+
+  describe '#no_overlapping_bookings' do
+    it 'adds an error if there are overlapping bookings' do
+      existing_booking = create(:booking, venue: venue, start_time: Time.now, end_time: Time.now + 1.hour)
+      new_booking = build(:booking, venue: venue, start_time: Time.now + 30.minutes, end_time: Time.now + 1.hour + 30.minutes)
+
+      new_booking.valid?
+      expect(new_booking.errors[:base]).to include("Booking overlaps with an existing booking")
+    end
+
+    it 'does not add an error if there are no overlapping bookings' do
+      existing_booking = create(:booking, venue: venue, start_time: Time.now, end_time: Time.now + 1.hour)
+      new_booking = build(:booking, venue: venue, start_time: Time.now + 2.hours, end_time: Time.now + 3.hours)
+
+      new_booking.valid?
+      expect(new_booking.errors[:base]).to be_empty
     end
   end
 end

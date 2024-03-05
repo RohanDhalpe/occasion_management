@@ -29,13 +29,17 @@
 
 en:
   errors:
-    unauthorized: "Unauthorized"
-    invalid_credentials: "Invalid email or password."
-    user_create_error: "Failed to create user: %{errors}"
-    user_update_error: "Failed to update user: %{errors}"
-    user_delete_error: "Failed to delete user: %{errors}"
-    not_found:
-      booking: "Booking not found"
-      venue: "Venue not found."
-
+    unauthorized_access: "Unauthorized access"
+    record_not_found: "Record not found"
+    unauthorized_update: "Unauthorized to update"
+    unauthorized_delete: "Unauthorized to delete"
+    booking_create_failed: "Booking creation failed"
+    booking_update_failed: "Booking update failed"
+    user_create_failed: "User creation failed"
+    invalid_credentials: "Invalid credentials"
+    user_update_failed: "User update failed"
+    user_delete_failed: "User deletion failed"
+    venue_create_failed: "Venue creation failed"
+    venue_update_failed: "Venue update failed"
+    venue_delete_failed: "Venue deletion failed"
 

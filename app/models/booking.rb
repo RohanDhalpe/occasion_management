@@ -1,4 +1,5 @@
 class Booking < ApplicationRecord
+
   belongs_to :user
   belongs_to :venue
 
@@ -13,7 +14,7 @@ class Booking < ApplicationRecord
   end
 
   def overlapping_bookings
-    Booking.where(venue_id: venue_id).where.not(id: id) # Exclude self if updating
+    Booking.where(venue_id: venue_id).where.not(id: id) 
            .where("start_time < ?", end_time)
            .where("end_time > ?", start_time)
   end

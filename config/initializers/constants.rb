@@ -3,4 +3,4 @@ ROLES = {
   customer: 'CUSTOMER'
 }.freeze
 
-STATUSES = ['Booked', 'Confirmed', 'Pending', 'Cancelled'].freeze
+STATUSES = ['Booked', 'Cancelled'].freeze

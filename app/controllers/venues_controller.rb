@@ -20,7 +20,7 @@ class VenuesController < ApplicationController
     if @venue.save
       render json: @venue, status: :created
     else
-      render json: { error: @venue.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: I18n.t('errors.venue_create_failed') }, status: :unprocessable_entity
     end
   end
 
@@ -28,7 +28,7 @@ class VenuesController < ApplicationController
     if @venue.update(venue_params)
       render json: @venue
     else
-      render json: { error: @venue.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: I18n.t('errors.venue_update_failed') }, status: :unprocessable_entity
     end
   end
 
@@ -37,7 +37,7 @@ class VenuesController < ApplicationController
       @venue.destroy
       render json: { message: 'Venue deleted successfully.' }
     else
-      render json: { error: I18n.t('errors.not_found.venue') }, status: :not_found
+      render json: { error: I18n.t('errors.record_not_found') }, status: :not_found
     end
   end
 
