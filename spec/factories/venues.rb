@@ -1,9 +1,8 @@
-# spec/factories/venues.rb
 FactoryBot.define do
   factory :venue do
     name { Faker::Company.name }
-    venue_type { %w[Conference_Room Auditorium Banquet_Hall].sample }
-    start_time { Faker::Time.between(from: DateTime.now - 1, to: DateTime.now, format: :default) }
-    end_time { Faker::Time.between(from: DateTime.now, to: DateTime.now + 1, format: :default) }
+    venue_type { Faker::Lorem.word.capitalize }
+    start_time { Faker::Time.forward(days: 5, period: :morning) }
+    end_time { Faker::Time.forward(days: 5, period: :evening) }
   end
 end

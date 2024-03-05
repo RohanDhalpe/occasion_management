@@ -1,4 +1,3 @@
-# spec/models/role_spec.rb
 require 'rails_helper'
 
 RSpec.describe Role, type: :model do
